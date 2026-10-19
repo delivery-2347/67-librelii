@@ -13,14 +13,8 @@
 
 ## Установка
 
-### Через ModuleScript — обычный Roblox-проект
-
-1. Создай `ModuleScript` с именем `CUCUMBER` в `ReplicatedStorage`.
-2. Вставь в него содержимое [`CUCUMBER.lua`](CUCUMBER.lua).
-3. Используй библиотеку из `LocalScript` на клиенте:
-
 ```lua
-local Cucumber = loadstring(game:HttpGet("")
+local Cucumber = loadstring(game:HttpGet("https://raw.githubusercontent.com/delivery-2347/67-librelii/refs/heads/main/CUCUMBER.lua"))
 ```
 
 Библиотеку нужно создавать на клиенте: она использует `Players.LocalPlayer` и `PlayerGui`.
@@ -32,7 +26,7 @@ local Cucumber = loadstring(game:HttpGet("")
 ## Быстрый пример
 
 ```lua
-local Cucumber = loadstring(game:HttpGet("")
+local Cucumber = loadstring(game:HttpGet("https://raw.githubusercontent.com/delivery-2347/67-librelii/refs/heads/main/CUCUMBER.lua"))
 
 local Window = Cucumber.new({
     Name = "CUCUMBER",
