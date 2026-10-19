@@ -247,3 +247,273 @@ Window:Destroy() -- удалить GUI и очистить соединения
 - `Close()` не отключает callback-и: окно можно открыть снова. Для окончательного удаления вызывай `Destroy()`.
 - Не создавай десятки одинаковых окон. Одно окно с несколькими вкладками обычно проще и легче.
 - Библиотека отвечает за интерфейс. Код в `Callback` — твоя логика; например, `Slider` сообщает новое значение, но сам по себе не меняет характеристики персонажа.
+
+## full
+
+```lua
+--[[
+    CUCUMBER UI — FULL FEATURE DEMO
+    Paste into a client LocalScript, or run in an environment where
+    game:HttpGet + loadstring are available.
+
+    Demonstrates every control, callbacks, setters, notifications,
+    window methods, changing names/values, and cleanup.
+]]
+
+local URL = "https://raw.githubusercontent.com/delivery-2347/67-librelii/refs/heads/main/CUCUMBER.lua"
+
+local ok, Cucumber = pcall(function()
+    local source = game:HttpGet(URL)
+    local chunk = assert(loadstring(source), "Could not compile CUCUMBER.lua")
+    return chunk()
+end)
+
+if not ok then
+    warn("[CUCUMBER DEMO] Library load failed: " .. tostring(Cucumber))
+    return
+end
+
+if type(Cucumber) ~= "table" or type(Cucumber.new) ~= "function" then
+    warn("[CUCUMBER DEMO] The URL did not return a CUCUMBER UI library table.")
+    return
+end
+
+local Window = Cucumber.new({
+    Name = "CUCUMBER",
+    Subtitle = "FULL FEATURE DEMO",
+    Accent = Color3.fromRGB(51, 192, 106),
+    Size = UDim2.fromOffset(430, 350),
+    ToggleKey = Enum.KeyCode.RightShift,
+})
+
+--// Main tab: one example of every visual control.
+local Main = Window:CreateTab("Main")
+local Controls = Main:CreateSection("CONTROLS")
+
+local statusLabel = Controls:Label({
+    Text = "Status: ready",
+    Color = Color3.fromRGB(51, 192, 106),
+})
+
+local info = Controls:Paragraph({
+    Title = "CUCUMBER UI",
+    Content = "Compact black GUI, green accent, tabs, controls, callbacks and cleanup.",
+})
+
+local enabledToggle = Controls:Toggle({
+    Name = "Example toggle",
+    Default = false,
+    Callback = function(value)
+        statusLabel:Set("Toggle: " .. tostring(value))
+        print("[DEMO] Toggle value:", value)
+    end,
+})
+
+local powerSlider = Controls:Slider({
+    Name = "Power",
+    Min = 0,
+    Max = 100,
+    Step = 5,
+    Default = 35,
+    Suffix = "%",
+    Callback = function(value)
+        print("[DEMO] Slider value:", value)
+    end,
+})
+
+local messageBox = Controls:Textbox({
+    Name = "Textbox",
+    Default = "Hello, CUCUMBER!",
+    Placeholder = "Type and press Enter...",
+    Changed = function(value)
+        -- Called as text changes; keep this lightweight.
+        print("[DEMO] Text changed:", value)
+    end,
+    Callback = function(value, enterPressed)
+        if enterPressed then
+            Window:Notify("Textbox submitted", value, 3)
+        end
+    end,
+})
+
+local modeDropdown = Controls:Dropdown({
+    Name = "Mode",
+    Options = { "Normal", "Quiet", "Fast" },
+    Default = "Normal",
+    Callback = function(value)
+        statusLabel:Set("Mode: " .. tostring(value))
+        print("[DEMO] Dropdown value:", value)
+    end,
+})
+
+local actionKeybind = Controls:Keybind({
+    Name = "Demo action",
+    Default = Enum.KeyCode.G,
+    Callback = function(keyCode)
+        enabledToggle:Toggle()
+        Window:Notify("Keybind", keyCode.Name .. " pressed", 2)
+    end,
+})
+
+local accentPicker = Controls:Colorpicker({
+    Name = "Accent color",
+    Default = Color3.fromRGB(51, 192, 106),
+    Callback = function(color)
+        Window:SetAccent(color)
+    end,
+})
+
+Controls:Divider()
+
+local notifyButton = Controls:Button({
+    Name = "Show notification",
+    Callback = function()
+        Window:Notify("CUCUMBER UI", "Notifications work!", 3)
+    end,
+})
+
+--// Methods tab: examples of changing existing controls after creation.
+local Methods = Window:CreateTab("Methods")
+local ChangeValues = Methods:CreateSection("CHANGE VALUES")
+
+ChangeValues:Button({
+    Name = "Set toggle ON + rename",
+    Callback = function()
+        enabledToggle:Set(true)
+        enabledToggle:SetName("Example toggle (renamed)")
+        Window:Notify("Set() / SetName()", "Toggle is now ON", 2)
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Set slider to 75",
+    Callback = function()
+        powerSlider:Set(75)
+        powerSlider:SetName("Power (changed)")
+        print("[DEMO] Current slider:", powerSlider:Get())
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Set textbox text",
+    Callback = function()
+        messageBox:Set("Changed from code", true)
+        messageBox:SetName("Textbox (changed)")
+        messageBox:SetPlaceholder("Placeholder can change too...")
+        print("[DEMO] Textbox value:", messageBox:Get())
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Replace dropdown options",
+    Callback = function()
+        modeDropdown:SetOptions({ "Normal", "Fast", "Turbo" })
+        modeDropdown:Set("Turbo")
+        modeDropdown:SetName("Updated mode")
+        print("[DEMO] Dropdown value:", modeDropdown:Get())
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Set keybind to H",
+    Callback = function()
+        actionKeybind:Set(Enum.KeyCode.H)
+        actionKeybind:SetName("Demo action (H)")
+        print("[DEMO] Keybind:", actionKeybind:Get().Name)
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Set accent to blue",
+    Callback = function()
+        accentPicker:Set(Color3.fromRGB(90, 140, 255))
+        accentPicker:SetName("Blue accent")
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Change label + paragraph",
+    Callback = function()
+        statusLabel:Set("Status: updated by code")
+        statusLabel:SetName("Current status: OK")
+        info:SetTitle("Content changed")
+        info:SetContent("Label:Set(), Paragraph:SetTitle() and Paragraph:SetContent() were called.")
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Rename notification button",
+    Callback = function()
+        notifyButton:SetName("Notification button (renamed)")
+        notifyButton:SetCallback(function()
+            Window:Notify("Updated callback", "Button:SetCallback() also works.", 3)
+        end)
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Temporarily disable notification button",
+    Callback = function()
+        notifyButton:SetDisabled(true)
+        Window:Notify("Button disabled", "Run the enable button below to restore it.", 3)
+    end,
+})
+
+ChangeValues:Button({
+    Name = "Enable notification button",
+    Callback = function()
+        notifyButton:SetDisabled(false)
+    end,
+})
+
+--// Window tab: window methods and lifecycle.
+local WindowTab = Window:CreateTab("Window")
+local WindowActions = WindowTab:CreateSection("WINDOW METHODS")
+
+WindowActions:Button({
+    Name = "Change title and subtitle",
+    Callback = function()
+        Window:SetTitle("CUCUMBER UI")
+        Window:SetSubtitle("TITLE UPDATED")
+    end,
+})
+
+WindowActions:Button({
+    Name = "Resize window",
+    Callback = function()
+        Window:SetSize(UDim2.fromOffset(470, 370))
+    end,
+})
+
+WindowActions:Button({
+    Name = "Restore window size",
+    Callback = function()
+        Window:SetSize(UDim2.fromOffset(430, 350))
+    end,
+})
+
+WindowActions:Button({
+    Name = "Toggle window visibility",
+    Callback = function()
+        Window:Toggle()
+    end,
+})
+
+WindowActions:Button({
+    Name = "Hide window (RightShift to reopen)",
+    Callback = function()
+        Window:Close()
+    end,
+})
+
+WindowActions:Button({
+    Name = "Destroy UI (permanent)",
+    Callback = function()
+        Window:Destroy()
+    end,
+})
+
+--// Final setup notification.
+Window:Notify("Loaded", "RightShift: show/hide | G: toggle example | Esc: close", 5)
+print("[CUCUMBER DEMO] Loaded. RightShift shows/hides the window; G toggles the example toggle.")
+```
