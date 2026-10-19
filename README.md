@@ -20,7 +20,7 @@
 3. Используй библиотеку из `LocalScript` на клиенте:
 
 ```lua
-local Cucumber = require(game:GetService("ReplicatedStorage"):WaitForChild("CUCUMBER"))
+local Cucumber = loadstring(game:HttpGet("")
 ```
 
 Библиотеку нужно создавать на клиенте: она использует `Players.LocalPlayer` и `PlayerGui`.
@@ -32,7 +32,7 @@ local Cucumber = require(game:GetService("ReplicatedStorage"):WaitForChild("CUCU
 ## Быстрый пример
 
 ```lua
-local Cucumber = require(game:GetService("ReplicatedStorage"):WaitForChild("CUCUMBER"))
+local Cucumber = loadstring(game:HttpGet("")
 
 local Window = Cucumber.new({
     Name = "CUCUMBER",
